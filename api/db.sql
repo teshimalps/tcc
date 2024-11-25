@@ -1,0 +1,130 @@
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE TABLE `tbcategorias` (
+  `CAT_ID` int(11) NOT NULL,
+  `CAT_NOM` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbdelivery` (
+  `DEL_ID` int(11) NOT NULL,
+  `USER_ID` int(11) DEFAULT NULL,
+  `VEN_ID` int(11) DEFAULT NULL,
+  `DEL_NUM_CASA` varchar(4) DEFAULT NULL,
+  `DEL_CEP` varchar(8) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbformapag` (
+  `FORM_PAG_ID` int(11) NOT NULL,
+  `VEN_ID` int(11) DEFAULT NULL,
+  `FORM_PAG_DESC` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbitensvenda` (
+  `ITS_VEN_ID` int(11) NOT NULL,
+  `VEN_ID` int(11) DEFAULT NULL,
+  `PROD_ID` int(11) DEFAULT NULL,
+  `ITS_VEN_QTD` varchar(30) DEFAULT NULL,
+  `ITS_VEN_PRECO` varchar(12) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbprodutos` (
+  `PROD_ID` int(11) NOT NULL,
+  `CAT_ID` int(11) DEFAULT NULL,
+  `PROD_NOM` varchar(30) DEFAULT NULL,
+  `PROD_SUB_NOM` varchar(30) DEFAULT NULL,
+  `PROD_DESC` varchar(100) DEFAULT NULL,
+  `PROD_VAL` varchar(12) DEFAULT NULL,
+  `PROD_COMB` varchar(3) DEFAULT NULL,
+  `PROD_IMG` blob DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbusuarios` (
+  `USER_ID` int(11) NOT NULL,
+  `USER_TIP` varchar(6) DEFAULT NULL,
+  `USER_NOM` varchar(30) DEFAULT NULL,
+  `USER_EMAIL` varchar(50) DEFAULT NULL,
+  `USER_PAS` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `tbvendas` (
+  `VEN_ID` int(11) NOT NULL,
+  `USER_ID` int(11) DEFAULT NULL,
+  `PROD_ID` int(11) DEFAULT NULL,
+  `CAT_ID` int(11) DEFAULT NULL,
+  `VEN_NOM_CLI` varchar(30) DEFAULT NULL,
+  `VEN_DATA` date DEFAULT NULL,
+  `VEN_QTDE` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `tbcategorias`
+  ADD PRIMARY KEY (`CAT_ID`);
+
+ALTER TABLE `tbdelivery`
+  ADD PRIMARY KEY (`DEL_ID`),
+  ADD KEY `USER_ID` (`USER_ID`),
+  ADD KEY `VEN_ID` (`VEN_ID`);
+
+ALTER TABLE `tbformapag`
+  ADD PRIMARY KEY (`FORM_PAG_ID`),
+  ADD KEY `VEN_ID` (`VEN_ID`);
+
+ALTER TABLE `tbitensvenda`
+  ADD PRIMARY KEY (`ITS_VEN_ID`),
+  ADD KEY `VEN_ID` (`VEN_ID`),
+  ADD KEY `PROD_ID` (`PROD_ID`);
+
+ALTER TABLE `tbprodutos`
+  ADD PRIMARY KEY (`PROD_ID`),
+  ADD KEY `CAT_ID` (`CAT_ID`);
+
+ALTER TABLE `tbusuarios`
+  ADD PRIMARY KEY (`USER_ID`);
+
+ALTER TABLE `tbvendas`
+  ADD PRIMARY KEY (`VEN_ID`),
+  ADD KEY `USER_ID` (`USER_ID`),
+  ADD KEY `PROD_ID` (`PROD_ID`),
+  ADD KEY `CAT_ID` (`CAT_ID`);
+
+ALTER TABLE `tbcategorias`
+  MODIFY `CAT_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbdelivery`
+  MODIFY `DEL_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbformapag`
+  MODIFY `FORM_PAG_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbitensvenda`
+  MODIFY `ITS_VEN_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbprodutos`
+  MODIFY `PROD_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbusuarios`
+  MODIFY `USER_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbvendas`
+  MODIFY `VEN_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tbdelivery`
+  ADD CONSTRAINT `tbdelivery_ibfk_1` FOREIGN KEY (`USER_ID`) REFERENCES `tbusuarios` (`USER_ID`),
+  ADD CONSTRAINT `tbdelivery_ibfk_2` FOREIGN KEY (`VEN_ID`) REFERENCES `tbvendas` (`VEN_ID`);
+
+ALTER TABLE `tbformapag`
+  ADD CONSTRAINT `tbformapag_ibfk_1` FOREIGN KEY (`VEN_ID`) REFERENCES `tbvendas` (`VEN_ID`);
+
+ALTER TABLE `tbitensvenda`
+  ADD CONSTRAINT `tbitensvenda_ibfk_1` FOREIGN KEY (`VEN_ID`) REFERENCES `tbvendas` (`VEN_ID`),
+  ADD CONSTRAINT `tbitensvenda_ibfk_2` FOREIGN KEY (`PROD_ID`) REFERENCES `tbprodutos` (`PROD_ID`);
+
+ALTER TABLE `tbprodutos`
+  ADD CONSTRAINT `tbprodutos_ibfk_1` FOREIGN KEY (`CAT_ID`) REFERENCES `tbcategorias` (`CAT_ID`);
+
+ALTER TABLE `tbvendas`
+  ADD CONSTRAINT `tbvendas_ibfk_1` FOREIGN KEY (`USER_ID`) REFERENCES `tbusuarios` (`USER_ID`),
+  ADD CONSTRAINT `tbvendas_ibfk_2` FOREIGN KEY (`PROD_ID`) REFERENCES `tbprodutos` (`PROD_ID`),
+  ADD CONSTRAINT `tbvendas_ibfk_3` FOREIGN KEY (`CAT_ID`) REFERENCES `tbcategorias` (`CAT_ID`);
+COMMIT;
